@@ -1,0 +1,16 @@
+{
+  "name": "osca-webpage",
+  "version": "1.0.0",
+  "description": "OSCA webpage with automated press files scraper",
+  "main": "scripts/scrape-osca.js",
+  "scripts": {
+    "scrape": "node scripts/scrape-osca.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "axios": "^1.6.0"
+  }
+}
