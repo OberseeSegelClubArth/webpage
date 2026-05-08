@@ -2,10 +2,168 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OSCA in den Medien</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      color: #1a3a52;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .press-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .press-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.16);
+    }
+
+    .press-card-image {
+      width: 100%;
+      height: 280px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .press-card-content {
+      padding: 28px;
+    }
+
+    .press-card-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #667eea;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .press-card-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a3a52;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .press-card-text {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .press-card-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 28px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .press-card-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .press-card-button:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+      }
+
+      .header {
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .press-card-image {
+        height: 240px;
+      }
+
+      .press-card-content {
+        padding: 20px;
+      }
+
+      .press-card-title {
+        font-size: 19px;
+      }
+
+      .press-card-text {
+        font-size: 14px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h2>OSCA in den Medien</h2>
-  <p>Test erfolgreich: Das OSCA Presse-Widget läuft über GitHub Pages.</p>
+  <div class="container">
+    <div class="header">
+      <h1>OSCA in den Medien</h1>
+    </div>
+
+    <article class="press-card">
+      <div class="press-card-image">
+        OSCA Presse
+      </div>
+      <div class="press-card-content">
+        <div class="press-card-label">Rigipost · 7. Mai 2026</div>
+        <h2 class="press-card-title">Jagd nach dem Fuchsschwanz</h2>
+        <p class="press-card-text">
+          Medienbericht über die traditionelle Fuchsjagd des Obersee Segelclub Arth (OSCA) zum Saisonstart auf dem Zugersee.
+        </p>
+        <a href="#" class="press-card-button">Artikel öffnen</a>
+      </div>
+    </article>
+  </div>
 </body>
 </html>
