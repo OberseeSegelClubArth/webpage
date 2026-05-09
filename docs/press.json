@@ -1,6 +1,12 @@
 {
-  "lastUpdated": "2026-05-09T07:24:44.594Z",
+  "lastUpdated": "2026-05-09T10:54:11.082Z",
   "source": "https://www.osca.ch/der_club",
-  "count": 0,
-  "files": []
+  "count": 1,
+  "files": [
+    {
+      "title": "2026-05-07-rigipost-fuchsjagd-zugersee.jpg",
+      "url": "https://www.osca.ch/fileservlet?type=file&id=1000345&s=djEtKPTa-1r30KajlE5zxJJE5uNCfkRU8fV25DSzIx8rp0c=",
+      "type": "image"
+    }
+  ]
 }
