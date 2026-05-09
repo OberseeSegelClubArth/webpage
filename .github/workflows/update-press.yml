@@ -31,6 +31,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add docs/press.json
+          git add docs/press.json docs/cards.html
           git commit -m "Update OSCA press data" || echo "No changes to commit"
           git push
