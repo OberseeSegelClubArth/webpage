@@ -5,10 +5,12 @@ const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
 
-const OSCA_URL = 'https://www.osca.ch/der_club';
+// Dedicated, unlisted ClubDesk page that hosts only the press file list.
+// Visitors see the cards on /der_club; this page exists purely so the
+// scraper has a stable, focused data source.
+const OSCA_URL = 'https://www.osca.ch/der_club/press_list_for_scraping';
 const OUTPUT_FILE = path.join(__dirname, '../docs/press.json');
 const CARDS_FILE = path.join(__dirname, '../docs/cards.html');
-const SECTION_HEADING = 'OSCA in den Medien';
 
 async function scrapeOSCA() {
   console.log(`Fetching: ${OSCA_URL}`);
@@ -26,38 +28,35 @@ async function scrapeOSCA() {
   const baseHref = $('base[href]').attr('href');
   const baseUrl = baseHref ? new URL(baseHref, OSCA_URL).href : OSCA_URL;
 
-  // Locate the section that contains the "OSCA in den Medien" heading,
-  // so we never pick up logos, hero images, or footer files from other parts of the page.
-  const heading = $('h1, h2, h3, h4').filter((_, el) =>
-    $(el).text().trim() === SECTION_HEADING
-  ).first();
-
-  if (heading.length === 0) {
-    throw new Error(`Heading "${SECTION_HEADING}" not found on page`);
-  }
-
-  const section = heading.closest('[id^="section_"]');
-  if (section.length === 0) {
-    throw new Error(`Section wrapper for "${SECTION_HEADING}" not found`);
+  // Scope to ClubDesk file-list blocks (data-block-type="3"). Every press
+  // file is rendered inside one of these; favicons, hero images, and footer
+  // logos live in other block types and are therefore excluded automatically.
+  const fileListBlocks = $('[data-block-type="3"]');
+  if (fileListBlocks.length === 0) {
+    throw new Error('No ClubDesk file list block (data-block-type="3") found on page');
   }
 
   const files = [];
 
-  // (1) Plain hyperlinks to ClubDesk files, e.g. <a href="fileservlet?type=image&id=...">
-  section.find('a[href*="fileservlet"]').each((_, el) => {
-    const $a = $(el);
-    files.push(buildFile($a.attr('href'), titleFromAnchor($a), baseUrl));
-  });
+  fileListBlocks.each((_, block) => {
+    const $block = $(block);
 
-  // (2) ClubDesk file-list rows render as <tr onclick="window.open('fileservlet?...', '_blank')">.
-  // The filename lives in a non-icon <td> in the same row.
-  section.find('[onclick*="fileservlet"]').each((_, el) => {
-    const $row = $(el);
-    const onclick = $row.attr('onclick') || '';
-    const match = onclick.match(/window\.open\(\s*['"]([^'"]+)['"]/);
-    if (!match) return;
-    const filename = $row.find('td.cd-table-value').not('.cd-icon').first().text().trim();
-    files.push(buildFile(match[1], filename, baseUrl));
+    // (1) Plain hyperlinks to ClubDesk files, e.g. <a href="fileservlet?...">
+    $block.find('a[href*="fileservlet"]').each((_, el) => {
+      const $a = $(el);
+      files.push(buildFile($a.attr('href'), titleFromAnchor($a), baseUrl));
+    });
+
+    // (2) ClubDesk file-list rows render as <tr onclick="window.open('fileservlet?...', '_blank')">.
+    // The filename lives in a non-icon <td> in the same row.
+    $block.find('[onclick*="fileservlet"]').each((_, el) => {
+      const $row = $(el);
+      const onclick = $row.attr('onclick') || '';
+      const match = onclick.match(/window\.open\(\s*['"]([^'"]+)['"]/);
+      if (!match) return;
+      const filename = $row.find('td.cd-table-value').not('.cd-icon').first().text().trim();
+      files.push(buildFile(match[1], filename, baseUrl));
+    });
   });
 
   const uniqueFiles = Array.from(new Map(files.map(f => [f.url, f])).values());
