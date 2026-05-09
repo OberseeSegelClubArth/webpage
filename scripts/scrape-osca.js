@@ -7,106 +7,95 @@ const path = require('path');
 
 const OSCA_URL = 'https://www.osca.ch/der_club';
 const OUTPUT_FILE = path.join(__dirname, '../docs/press.json');
-
-// Image and PDF file extensions
-const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
-const PDF_EXTENSION = '.pdf';
+const SECTION_HEADING = 'OSCA in den Medien';
 
 async function scrapeOSCA() {
-  try {
-    console.log(`Fetching: ${OSCA_URL}`);
-    const response = await axios.get(OSCA_URL, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      }
-    });
-
-    const $ = cheerio.load(response.data);
-    const files = [];
-
-    // Find the "OSCA in den Medien" section
-    // Look for headings that contain "OSCA in den Medien"
-    const mediaSection = $('*').filter((i, el) => {
-      const text = $(el).text();
-      return text.includes('OSCA in den Medien');
-    }).first();
-
-    if (mediaSection.length === 0) {
-      console.warn('Warning: "OSCA in den Medien" section not found');
+  console.log(`Fetching: ${OSCA_URL}`);
+  const response = await axios.get(OSCA_URL, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     }
+  });
 
-    // Get all links on the page (in case we need to search more broadly)
-    const allLinks = $('a[href]');
+  const $ = cheerio.load(response.data);
 
-    allLinks.each((index, element) => {
-      const $link = $(element);
-      const href = $link.attr('href');
-      const linkText = $link.text().trim();
+  // Locate the section that contains the "OSCA in den Medien" heading,
+  // so we never pick up logos, hero images, or footer files from other parts of the page.
+  const heading = $('h1, h2, h3, h4').filter((_, el) =>
+    $(el).text().trim() === SECTION_HEADING
+  ).first();
 
-      if (!href || !linkText) return;
-
-      // Check if link is a file we care about
-      const lowerHref = href.toLowerCase();
-      
-      // Check for image files
-      const isImage = IMAGE_EXTENSIONS.some(ext => lowerHref.endsWith(ext));
-      
-      // Check for PDF files
-      const isPDF = lowerHref.endsWith(PDF_EXTENSION);
-      
-      // Check for ClubDesk file links
-      const isClubDesk = href.includes('/clubdesk/w_OSCA/fileservlet');
-
-      if (isImage || isPDF || isClubDesk) {
-        // Make relative URLs absolute if needed
-        let absoluteUrl = href;
-        if (!href.startsWith('http')) {
-          if (href.startsWith('/')) {
-            absoluteUrl = new URL(href, OSCA_URL).href;
-          } else {
-            absoluteUrl = new URL(href, OSCA_URL).href;
-          }
-        }
-
-        files.push({
-          title: linkText,
-          url: absoluteUrl,
-          type: isImage ? 'image' : isPDF ? 'pdf' : 'clubdesk',
-          extension: isImage ? 
-            IMAGE_EXTENSIONS.find(ext => lowerHref.endsWith(ext)) : 
-            isPDF ? PDF_EXTENSION : 'clubdesk'
-        });
-      }
-    });
-
-    // Remove duplicates based on URL
-    const uniqueFiles = Array.from(
-      new Map(files.map(file => [file.url, file])).values()
-    );
-
-    // Prepare output
-    const output = {
-      lastUpdated: new Date().toISOString(),
-      source: OSCA_URL,
-      count: uniqueFiles.length,
-      files: uniqueFiles
-    };
-
-    // Ensure docs directory exists
-    const docsDir = path.dirname(OUTPUT_FILE);
-    if (!fs.existsSync(docsDir)) {
-      fs.mkdirSync(docsDir, { recursive: true });
-    }
-
-    // Write to file
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
-    console.log(`✓ Successfully wrote ${uniqueFiles.length} files to ${OUTPUT_FILE}`);
-    console.log(`Last updated: ${output.lastUpdated}`);
-
-  } catch (error) {
-    console.error('Error scraping OSCA:', error.message);
-    process.exit(1);
+  if (heading.length === 0) {
+    throw new Error(`Heading "${SECTION_HEADING}" not found on page`);
   }
+
+  const section = heading.closest('[id^="section_"]');
+  if (section.length === 0) {
+    throw new Error(`Section wrapper for "${SECTION_HEADING}" not found`);
+  }
+
+  const files = [];
+
+  // (1) Plain hyperlinks to ClubDesk files, e.g. <a href="fileservlet?type=image&id=...">
+  section.find('a[href*="fileservlet"]').each((_, el) => {
+    const $a = $(el);
+    files.push(buildFile($a.attr('href'), titleFromAnchor($a)));
+  });
+
+  // (2) ClubDesk file-list rows render as <tr onclick="window.open('fileservlet?...', '_blank')">.
+  // The filename lives in a non-icon <td> in the same row.
+  section.find('[onclick*="fileservlet"]').each((_, el) => {
+    const $row = $(el);
+    const onclick = $row.attr('onclick') || '';
+    const match = onclick.match(/window\.open\(\s*['"]([^'"]+)['"]/);
+    if (!match) return;
+    const filename = $row.find('td.cd-table-value').not('.cd-icon').first().text().trim();
+    files.push(buildFile(match[1], filename));
+  });
+
+  const uniqueFiles = Array.from(new Map(files.map(f => [f.url, f])).values());
+
+  const output = {
+    lastUpdated: new Date().toISOString(),
+    source: OSCA_URL,
+    count: uniqueFiles.length,
+    files: uniqueFiles
+  };
+
+  fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
+  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
+  console.log(`✓ Wrote ${uniqueFiles.length} files to ${OUTPUT_FILE}`);
 }
 
-scrapeOSCA();
+function buildFile(rawUrl, title) {
+  const absoluteUrl = new URL(rawUrl, OSCA_URL).href;
+  return {
+    title: title || 'Pressemitteilung',
+    url: absoluteUrl,
+    type: classify(absoluteUrl, title)
+  };
+}
+
+// Decide how index.html should render the card. Prefer the actual filename
+// extension when we have it (a ClubDesk type=file can still be a .jpg);
+// fall back to the URL's `type` query param.
+function classify(absoluteUrl, title) {
+  const lowerTitle = (title || '').toLowerCase();
+  if (/\.(jpe?g|png|webp|gif)$/.test(lowerTitle)) return 'image';
+  if (lowerTitle.endsWith('.pdf')) return 'pdf';
+  const typeParam = new URL(absoluteUrl).searchParams.get('type');
+  if (typeParam === 'image') return 'image';
+  return 'clubdesk';
+}
+
+function titleFromAnchor($a) {
+  const text = $a.text().trim();
+  if (text) return text;
+  const alt = ($a.find('img').attr('alt') || '').trim();
+  return alt;
+}
+
+scrapeOSCA().catch(err => {
+  console.error('Error scraping OSCA:', err.message);
+  process.exit(1);
+});
