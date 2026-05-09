@@ -183,16 +183,15 @@
       const gridEl = document.getElementById('grid');
       
       try {
-        const response = await fetch('press.json');
-        
+        // cache: 'no-store' guarantees we always get the latest scrape
+        // result, never a 10-minute-stale copy from the browser cache.
+        const response = await fetch('press.json', { cache: 'no-store' });
+
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
-        
-        const data = response.json();
-        
-        // Wait for the promise to resolve
-        const pressData = await data;
+
+        const pressData = await response.json();
         
         if (!pressData.files || pressData.files.length === 0) {
           statusEl.innerHTML = `Zuletzt aktualisiert: ${new Date(pressData.lastUpdated).toLocaleString('de-CH')}`;
