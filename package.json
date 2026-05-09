@@ -4,7 +4,8 @@
   "description": "OSCA webpage with automated press files scraper",
   "main": "scripts/scrape-osca.js",
   "scripts": {
-    "scrape": "node scripts/scrape-osca.js"
+    "scrape": "node scripts/scrape-osca.js",
+    "update": "node scripts/scrape-osca.js"
   },
   "keywords": [],
   "author": "",
