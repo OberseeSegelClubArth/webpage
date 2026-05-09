@@ -192,22 +192,27 @@ function renderCard(article) {
   }
 
   const visual = article.thumbUrl
-    ? `<a href="${articleUrl}" target="_blank" rel="noopener" style="display:block;text-decoration:none;"><img src="${escapeHtml(article.thumbUrl)}" alt="${headline}" itemprop="image" style="display:block;width:100%;height:auto;max-height:520px;object-fit:contain;background:#f5f5f5;" /></a>`
-    : `<a href="${articleUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;height:200px;background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);color:white;text-decoration:none;font-size:64px;">📄</a>`;
+    ? `<a href="${articleUrl}" target="_blank" rel="noopener" style="display:block;text-decoration:none;"><img src="${escapeHtml(article.thumbUrl)}" alt="${headline}" itemprop="image" style="display:block;width:100%;height:180px;object-fit:cover;background:#f5f5f5;" /></a>`
+    : `<a href="${articleUrl}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;height:180px;background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);color:white;text-decoration:none;font-size:56px;">📄</a>`;
 
-  return `<article itemscope itemtype="https://schema.org/NewsArticle" style="display:block;max-width:720px;margin:24px auto;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  return `<article itemscope itemtype="https://schema.org/NewsArticle" style="flex:0 1 300px;min-width:260px;display:flex;flex-direction:column;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
 ${visual}
-<div style="padding:18px 22px;">
-${metaLine ? `<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#777;margin-bottom:8px;">${metaLine}</div>` : ''}
-<h3 itemprop="headline" style="margin:0 0 12px 0;font-size:22px;line-height:1.3;color:#222;">${headline}</h3>
-<a href="${articleUrl}" target="_blank" rel="noopener" itemprop="url" style="font-weight:bold;color:#0066cc;text-decoration:none;">${linkLabel} &rarr;</a>
+<div style="padding:14px 18px;flex:1;display:flex;flex-direction:column;">
+${metaLine ? `<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#777;margin-bottom:6px;">${metaLine}</div>` : ''}
+<h3 itemprop="headline" style="margin:0 0 10px 0;font-size:17px;line-height:1.3;color:#222;">${headline}</h3>
+<a href="${articleUrl}" target="_blank" rel="noopener" itemprop="url" style="margin-top:auto;font-weight:bold;color:#0066cc;text-decoration:none;font-size:14px;">${linkLabel} &rarr;</a>
 </div>
 </article>`;
 }
 
 function renderCardsPage(articles, lastUpdated) {
+  // Wrap all cards in a flex container so they sit side-by-side on wide
+  // screens and wrap to fewer per row on narrow screens — no media queries
+  // needed (ClubDesk's HTML block strips <style>; flex-wrap handles it).
   const cardsHtml = articles.length > 0
-    ? articles.map(renderCard).join('\n')
+    ? `<div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-items:stretch;margin:24px 0;">
+${articles.map(renderCard).join('\n')}
+</div>`
     : '<p style="text-align:center;color:#999;padding:40px;">Noch keine Pressemitteilungen.</p>';
 
   const updatedLabel = new Date(lastUpdated).toLocaleString('de-CH', {
