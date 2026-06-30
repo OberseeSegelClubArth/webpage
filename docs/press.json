@@ -1,8 +1,13 @@
 {
-  "lastUpdated": "2026-06-30T13:49:39.118Z",
+  "lastUpdated": "2026-06-30T14:36:05.298Z",
   "source": "https://www.osca.ch/der_club/press_list_for_scraping",
   "count": 3,
   "files": [
+    {
+      "title": "2025-11-25-Rigipost-OSCA-50-Jubileum.jpg",
+      "url": "https://www.osca.ch/clubdesk/w_OSCA/fileservlet?type=file&id=1000346&s=djEttVLUz-ysmaTzd7qfp1iV-NapwC3BqpVuetLzzgwEnW8=",
+      "type": "image"
+    },
     {
       "title": "2026-05-07-Rigipost-fuchsjagd-zugersee.jpg",
       "url": "https://www.osca.ch/clubdesk/w_OSCA/fileservlet?type=file&id=1000347&s=djEtBBuIDLnje9ZBaO9iGr1Ud8YheowpytdMlsE063hIEjk=",
@@ -11,11 +16,6 @@
     {
       "title": "2026-06-27-rigipost-segelwochenende-zugersee.jpg",
       "url": "https://www.osca.ch/clubdesk/w_OSCA/fileservlet?type=file&id=1000361&s=djEtnFcYiaudLETOQG_2u3fIsL_y_Jqtj61zfCHePEz2gwQ=",
-      "type": "image"
-    },
-    {
-      "title": "2026-11-25-Rigipost-OSCA-50-Jubileum.jpg",
-      "url": "https://www.osca.ch/clubdesk/w_OSCA/fileservlet?type=file&id=1000346&s=djEttVLUz-ysmaTzd7qfp1iV-NapwC3BqpVuetLzzgwEnW8=",
       "type": "image"
     }
   ]
