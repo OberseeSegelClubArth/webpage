@@ -1,7 +1,7 @@
 {
-  "lastUpdated": "2026-08-25T06:58:49.359Z",
+  "lastUpdated": "2026-08-25T13:00:06.127Z",
   "source": "https://www.osca.ch/der_club/press_list_for_scraping",
-  "count": 3,
+  "count": 4,
   "files": [
     {
       "title": "2025-11-25-Rigipost-OSCA-50-Jubileum.jpg",
@@ -16,6 +16,11 @@
     {
       "title": "2026-06-27-rigipost-segelwochenende-zugersee.jpg",
       "url": "https://www.osca.ch/clubdesk/w_OSCA/fileservlet?type=file&id=1000361&s=djEtnFcYiaudLETOQG_2u3fIsL_y_Jqtj61zfCHePEz2gwQ=",
+      "type": "image"
+    },
+    {
+      "title": "2026-08-16-rigipost-OberseeCup-zugersee.jpeg",
+      "url": "https://www.osca.ch/clubdesk/w_OSCA/fileservlet?type=file&id=1000379&s=djEtcuTQmXgbLkvNEI0WfCGtFzSmNQwRWxPZJzlFNH6PlRA=",
       "type": "image"
     }
   ]
